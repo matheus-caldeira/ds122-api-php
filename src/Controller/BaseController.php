@@ -10,6 +10,13 @@ class BaseController {
     $this->request = $request;
   }
 
+  protected function requiredKeys($keys, $values) {
+    foreach($keys as $key) {
+      if (empty($values["$key"]))
+        $this->keyIsRequired($key);
+    }
+  }
+
   protected function getBodyParams() {
     if(in_array($this->request->requestMethod, $this->supportedBodyMethods)) {
       $this->checkContentType();
@@ -32,39 +39,37 @@ class BaseController {
   }
 
   protected function getUserAuth() {
-    $email = NULL;
-    $password = NULL;
-    $mod = NULL;
-    if (isset($_SERVER['PHP_AUTH_USER'])) {
-      $email = $_SERVER['PHP_AUTH_USER'];
-      $password = $_SERVER['PHP_AUTH_PW'];
-      $mod = 'PHP_AUTH_USER';
-    } elseif (isset( $_SERVER['HTTP_AUTHORIZATION'])) {
-        if (preg_match( '/^basic/i', $_SERVER['HTTP_AUTHORIZATION']))
-          list( $email, $password ) = explode( ':', base64_decode( substr( $_SERVER['HTTP_AUTHORIZATION'], 6 ) ) );
-      $mod = 'HTTP_AUTHORIZATION';
-    }
-  
-    if (is_null($email))
+    if(!isset($this->request->headers['Authorization'])) {
       $this->unauthorizedUser();
+    }
+
+    list($bearer, $token) = explode(" ", $this->request->headers['Authorization']);
+
+    if(empty($token)) {
+      $this->unauthorizedUser();
+    }
 
     $userModel = new UserModel();
-    $user = $userModel->findUserByEmailWithPassword($email);
+    $user = $userModel->findUserByToken($token);
 
-    if (empty($user))
-      $this->unauthorizedUser();
-
-    if (password_verify($password, $user['password'])) {
-      $this->user = $user;
-    } else {
+    if (empty($user)){
       $this->unauthorizedUser();
     }
+
+    $this->user = $user;
   }
 
-  private function unauthorizedUser() {
+  protected function unauthorizedUser() {
     $this->response(
       array('error' => "Unauthorized"),
       array("{$this->request->serverProtocol} 401 Unauthorized")
+    );
+  }
+
+  private function keyIsRequired($key) {
+    $this->response(
+      array('error' => "$key is required"),
+      array('Content-Type: application/json', "{$this->request->serverProtocol} 400 Bad Request")
     );
   }
 

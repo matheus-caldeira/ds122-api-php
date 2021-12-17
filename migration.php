@@ -21,7 +21,10 @@
     email      varchar(30) not null,
     first_name varchar(30) null,
     last_name  varchar(30) null,
-    password VARCHAR(120) not null,
+    password varchar(120) not null,
+    token varchar(120) null,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    updated_at timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     constraint users_pk
         primary key (id)
   );";
@@ -33,6 +36,8 @@
     title       varchar(50) not null,
     description text        null,
     image varchar(120)      null,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    updated_at timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     constraint books_pk
         primary key (id)
   );";
@@ -43,6 +48,8 @@
     id      int auto_increment,
     user_id int null,
     book_id int null,
+    created_at timestamp default CURRENT_TIMESTAMP,
+    updated_at timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     constraint user_books_pk
         primary key (id),
     constraint user_books_books_id_fk

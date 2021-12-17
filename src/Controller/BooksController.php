@@ -1,9 +1,9 @@
 <?php
-class UsersController extends BaseController {
+class BooksController extends BaseController {
   public function index() {
     try {
       $arrQueryStringParams = $this->getQueryParams();
-      $userModel = new UserModel();
+      $bookModel = new BookModel();
 
       $intLimit = 10;
       if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
@@ -15,9 +15,9 @@ class UsersController extends BaseController {
         $offset = $arrQueryStringParams['offset'];
       }
 
-      $arrUsers = $userModel->getUsers($intLimit, $offset);
+      $arrBooks = $bookModel->getBooks($intLimit, $offset);
       $this->response(
-        $arrUsers,
+        $arrBooks,
         array('Content-Type: application/json', "{$this->request->serverProtocol} 200 OK")
       );
     } catch (Error $e) {
@@ -33,37 +33,23 @@ class UsersController extends BaseController {
   public function create() {
     try {
       $bodyParams = $this->getBodyParams();
-      $userModel = new UserModel();
+      $bookModel = new BookModel();
 
-      $this->requiredKeys(array('email', 'first_name', 'last_name', 'password'), $bodyParams);
+      $this->requiredKeys(array('title', 'description'), $bodyParams);
 
-      $hashed = password_hash($bodyParams['password'], PASSWORD_BCRYPT);
+      $book = $bookModel->createBook(
+        $bodyParams['title'],
+        $bodyParams['description']
+      );
 
-      $checkUser = $userModel->findUserByEmail($bodyParams['email']);
-
-      if (empty($checkUser)) {
-        $user = $userModel->createUser(
-          $bodyParams['email'],
-          $bodyParams['first_name'],
-          $bodyParams['last_name'],
-          $hashed
-        );
-
-        $this->response(
-          array(
-            'id' => $user,
-            'email' => $bodyParams['email'],
-            'first_name' => $bodyParams['first_name'],
-            'last_name' => $bodyParams['last_name']
-          ),
-          array('Content-Type: application/json', "{$this->request->serverProtocol} 200 OK")
-        );
-      } else {
-        $this->response(
-          array('error' => "Email já cadastrado"), 
-          array('Content-Type: application/json', "{$this->request->serverProtocol} 400 Bad Request")
-        );
-      }
+      $this->response(
+        array(
+          'id' => $book,
+          'title' => $bodyParams['title'],
+          'description' => $bodyParams['description'],
+        ),
+        array('Content-Type: application/json', "{$this->request->serverProtocol} 200 OK")
+      );
     } catch (Error $e) {
       $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
       $strErrorHeader = "{$this->request->serverProtocol} 500 Internal Server Error";
@@ -76,23 +62,23 @@ class UsersController extends BaseController {
 
   public function update() {
     try {
-      $this->getUserAuth();
       $bodyParams = $this->getBodyParams();
-      $userModel = new UserModel();
+      $bookModel = new BookModel();
 
-      $this->requiredKeys(array('first_name', 'last_name'), $bodyParams);
+      $this->requiredKeys(array('id', 'title', 'description'), $bodyParams);
 
-      $userModel->updateUser(
-        $this->user['id'],
-        $bodyParams['first_name'],
-        $bodyParams['last_name']
+
+      $bookModel->updateBook(
+        $bodyParams['id'],
+        $bodyParams['title'],
+        $bodyParams['description']
       );
 
       $this->response(
         array(
-          'id' => $this->user['id'],
-          'first_name' => $bodyParams['first_name'],
-          'last_name' => $bodyParams['last_name']
+          'id' => $bodyParams['id'],
+          'title' => $bodyParams['title'],
+          'description' => $bodyParams['description']
         ),
         array('Content-Type: application/json', "{$this->request->serverProtocol} 200 OK")
       );

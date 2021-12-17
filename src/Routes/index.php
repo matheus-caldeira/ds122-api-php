@@ -19,28 +19,43 @@
     $usersController->update();
   });
 
+  $router->post('/session', function($request) {
+    $sessionController = new SessionController($request);
+    $sessionController->create();
+  });
+
+  $router->delete('/session', function($request) {
+    $sessionController = new SessionController($request);
+    $sessionController->delete();
+  });
+
   $router->get('/books', function($request) {
-    $usersController = new UsersController($request);
-    $usersController->index();
+    $booksController = new BooksController($request);
+    $booksController->index();
   });
 
   $router->post('/books', function($request) {
-    $usersController = new UsersController($request);
-    $usersController->create();
+    $booksController = new BooksController($request);
+    $booksController->create();
   });
 
   $router->put('/books', function($request) {
-    $usersController = new UsersController($request);
-    $usersController->update();
+    $booksController = new BooksController($request);
+    $booksController->update();
+  });
+
+  $router->get('/user_books', function($request) {
+    $userBooksController = new UserBooksController($request);
+    $userBooksController->index();
   });
 
   $router->post('/user_books', function($request) {
-    $usersController = new UsersController($request);
-    $usersController->create();
+    $userBooksController = new UserBooksController($request);
+    $userBooksController->create();
   });
 
   $router->delete('/user_books', function($request) {
-    $usersController = new UsersController($request);
-    $usersController->update();
+    $userBooksController = new UserBooksController($request);
+    $userBooksController->delete();
   });
 ?>

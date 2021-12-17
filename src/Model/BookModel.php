@@ -3,21 +3,36 @@
 class BookModel extends BaseModel {
   public function getBooks($limit, $offset) {
     return $this->select(
-      "SELECT id, title, description, image FROM books ORDER BY id ASC LIMIT ? OFFSET ?",
+      "SELECT id, title, description, image, created_at, updated_at FROM books ORDER BY id ASC LIMIT ? OFFSET ?",
       ["ii", $limit, $offset]
     );
   }
 
-  public function updateBook($id, $title, $description, $image) {
-    $this->insert("UPDATE books SET first_name = ?, last_name = ?, image = ? WHERE id = ? LIMIT 1;",
-      ["sssi", $first_name, $last_name, $image, $id]
+  public function findBook($id) {
+    $book = $this->select("SELECT id, title, description, image, created_at, updated_at FROM books WHERE id = ? LIMIT 1;", ["i", $id]);
+
+    if (empty($book))
+      return NULL;
+
+    return $book[0];
+  }
+
+  public function updateBook($id, $title, $description) {
+    $this->insert("UPDATE books SET title = ?, description = ? WHERE id = ? LIMIT 1;",
+      ["ssi", $title, $description, $id]
     );
   }
 
-  public function createBook($title, $description, $image) {
+  public function updateBookImage($id, $image) {
+    $this->insert("UPDATE books SET image = ? WHERE id = ? LIMIT 1;",
+      ["si", $image, $id]
+    );
+  }
+
+  public function createBook($title, $description) {
     $this->insert(
-      "INSERT into books(title, description, $image) VALUES (?, ?, ?);",
-      ["sss", $title, $description, $image]
+      "INSERT into books(title, description) VALUES (?, ?);",
+      ["ss", $title, $description]
     );
 
     return $this->connection->insert_id;
