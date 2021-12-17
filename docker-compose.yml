@@ -7,6 +7,9 @@ networks:
 services:
   app:
     build:
+      args:
+        user: math
+        uid: 1000
       context: .
       dockerfile: ./Dockerfile
     ports:

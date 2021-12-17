@@ -6,4 +6,5 @@
   require_once PROJECT_ROOT_PATH . "/Controller/BooksController.php";
   require_once PROJECT_ROOT_PATH . "/Controller/UserBooksController.php";
   require_once PROJECT_ROOT_PATH . "/Controller/SessionController.php";
+  require_once PROJECT_ROOT_PATH . "/Controller/ImageBookController.php";
 ?>

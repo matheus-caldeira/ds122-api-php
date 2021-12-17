@@ -44,6 +44,11 @@
     $booksController->update();
   });
 
+  $router->post('/books/image', function($request) {
+    $imageBookController = new ImageBookController($request);
+    $imageBookController->create();
+  });
+
   $router->get('/user_books', function($request) {
     $userBooksController = new UserBooksController($request);
     $userBooksController->index();
